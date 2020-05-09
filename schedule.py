@@ -1,8 +1,8 @@
 import os
-import requests
 import re
 import xlrd
 import json
+import requests
 from bs4 import BeautifulSoup
 
 import config

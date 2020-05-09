@@ -4,6 +4,8 @@ log = True
 
 vk_api_token = secrets.vk_api_token
 
+owm_api_key = secrets.owm_api_key
+
 web_schedule_link = 'https://www.mirea.ru/schedule/'
 
 institute = 'Институт информационных технологий'

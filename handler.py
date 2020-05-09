@@ -2,6 +2,7 @@ import re
 import locale
 from response import Response
 from datetime import datetime, timedelta
+from weather import Weather
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 
 import config
@@ -130,6 +131,11 @@ class Handler:
                 return Response(message)
             else:
                 return Response('Я не знаю в какой вы группе')
+
+        # Погода
+        elif text == 'погода':
+            return Response(Weather.get_message('Москва'))
+
         else:
             return Response('Неизвестная команда')
 
@@ -201,7 +207,8 @@ class Handler:
 
         return message
 
-    def get_keyboard_schedule(self, message):
+    @staticmethod
+    def get_keyboard_schedule(message):
         keyboard = VkKeyboard(one_time=True)
         keyboard.add_button('На сегодня', color=VkKeyboardColor.POSITIVE)
         keyboard.add_button('На завтра', color=VkKeyboardColor.NEGATIVE)
@@ -213,7 +220,8 @@ class Handler:
         keyboard.add_button('Какая группа?')
         return Response(message, keyboard)
 
-    def get_study_week_number(self, days=0):
+    @staticmethod
+    def get_study_week_number(days=0):
         month = (datetime.today() + timedelta(days=days)).month
         week_number = (datetime.today() + timedelta(days=days)).isocalendar()[1]
 
