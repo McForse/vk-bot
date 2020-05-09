@@ -1,1 +1,1 @@
-vk-bot
+VK bot for python practice
