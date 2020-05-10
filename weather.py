@@ -6,6 +6,7 @@ from config import owm_api_key as key
 
 
 class Weather:
+
     url = 'http://api.openweathermap.org/data/2.5/weather?q={}&appid={}&units=metric&lang=ru'
     temp = '{"coord":{"lon":37.62,"lat":55.75},"weather":[{"id":804,"main":"Clouds","description":"пасмурно","icon":"04n"}],"base":"stations","main":{"temp":12.66,"feels_like":10.25,"temp_min":12,"temp_max":13,"pressure":1008,"humidity":62},"visibility":10000,"wind":{"speed":2,"deg":350},"clouds":{"all":100},"dt":1589053952,"sys":{"type":1,"id":9027,"country":"RU","sunrise":1588987736,"sunset":1589044980},"timezone":10800,"id":524901,"name":"Москва","cod":200}'
 
@@ -20,7 +21,7 @@ class Weather:
 
     @staticmethod
     def get_json(city):
-        # return requests.get(Weather.url.format(city, key)).json()
+        # return requests.get(self.url.format(city, key)).json()
         return json.loads(Weather.temp)
 
     @staticmethod

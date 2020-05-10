@@ -12,7 +12,9 @@ institute = 'Институт информационных технологий'
 
 excel_tables_path = 'schedule/tables/'
 
-json_data_path = 'schedule/data.json'
+json_schedule_path = 'schedule/data.json'
+
+covid_path = 'coronavirus/'
 
 week_days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 

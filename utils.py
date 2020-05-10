@@ -15,4 +15,4 @@ class Utils:
             )
             for tok in tokens
         ]
-        return " ".join(inflected)
+        return ' '.join(inflected)

@@ -1,5 +1,6 @@
 import re
 from response import Response
+from coronavirus import Coronavirus
 from datetime import datetime
 from weather import Weather
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
@@ -14,6 +15,7 @@ class Handler:
     def __init__(self, database, schedule):
         self.__database = database
         self.__schedule = schedule
+        self.__coronavirus = Coronavirus()
 
     def handle(self, user_id, text):
 
@@ -133,6 +135,10 @@ class Handler:
         # Погода
         elif text == 'погода':
             return Response(Weather.get_message('Москва'))
+
+        # Коронавирус
+        elif text == 'коронавирус' or text == 'ковид':
+            return Response(message=self.__coronavirus.get_message(), image=self.__coronavirus.get_image())
 
         else:
             return Response('Неизвестная команда')

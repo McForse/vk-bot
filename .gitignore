@@ -125,5 +125,6 @@ dmypy.json
 
 **/.DS_Store
 secrets.py
-schedule/
 test.py
+schedule/
+coronavirus/

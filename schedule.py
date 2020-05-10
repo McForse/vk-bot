@@ -15,6 +15,7 @@ class Schedule:
     def __init__(self):
         self.__courses_count = 0
         self.update()
+        self.__schedule = self.get()
 
     def update(self):
         self.get_files()
@@ -76,11 +77,11 @@ class Schedule:
                                 lecturer = sheet.cell(3 + j + i * 2 + k * 12, col_index + 2).value
                                 classroom = sheet.cell(3 + j + i * 2 + k * 12, col_index + 3).value
                                 url = sheet.cell(3 + j + i * 2 + k * 12, col_index + 4).value
-                                lesson = {"subject": Schedule.normalize_string(subject),
-                                          "lesson_type": Schedule.normalize_string(lesson_type),
-                                          "lecturer": Schedule.normalize_string(lecturer),
-                                          "classroom": Schedule.normalize_string(classroom),
-                                          "url": Schedule.normalize_string(url)
+                                lesson = {"subject": self.normalize_string(subject),
+                                          "lesson_type": self.normalize_string(lesson_type),
+                                          "lecturer": self.normalize_string(lecturer),
+                                          "classroom": self.normalize_string(classroom),
+                                          "url": self.normalize_string(url)
                                           }
                                 day[i].append(lesson)
 
@@ -88,14 +89,14 @@ class Schedule:
 
                     groups.update({group_cell: week})
 
-        file = open(config.json_data_path, "w")
+        file = open(config.json_schedule_path, "w")
         file.write(json.dumps(groups, ensure_ascii=False, indent=4))
         file.close()
 
     @staticmethod
     def get():
-        if config.json_data_path:
-            with open(config.json_data_path, 'r') as file:
+        if config.json_schedule_path:
+            with open(config.json_schedule_path, 'r') as file:
                 return json.load(file)
 
     @staticmethod

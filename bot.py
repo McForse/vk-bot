@@ -1,4 +1,5 @@
 import vk_api
+import requests
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.utils import get_random_id
 from schedule import Schedule
@@ -13,10 +14,10 @@ class Bot:
     def __init__(self):
         self.__schedule = Schedule()
 
-        self.__vk_session = vk_api.VkApi(token=token)
-        self.__vk = self.__vk_session.get_api()
+        self.__vk = vk_api.VkApi(token=token)
+        self.__vk_api = self.__vk.get_api()
 
-        self.__longpoll = VkLongPoll(self.__vk_session)
+        self.__longpoll = VkLongPoll(self.__vk)
         self.__database = Database()
         self.__handler = Handler(self.__database, self.__schedule)
 
@@ -35,22 +36,41 @@ class Bot:
                 res = self.__handler.handle(uid, text.lower())
 
                 # Сообщение
-                if res.get_keyboard() is None:
+                if res.get_keyboard() and res.get_image() is None:
                     self.send_message(uid, res.get_message())
 
                 # Клавиатура
                 elif res.get_keyboard() is not None:
                     self.send_keyboard(uid, res.get_message(), res.get_keyboard())
 
+                # Картинка
+                elif res.get_image() is not None:
+                    self.send_image(uid, res.get_message(), res.get_image())
+
     def send_message(self, user_id, message):
-        self.__vk.messages.send(
+        self.__vk_api.messages.send(
             user_id=user_id,
             random_id=get_random_id(),
             message=message)
 
     def send_keyboard(self, user_id, message, keyboard):
-        self.__vk.messages.send(
+        self.__vk_api.messages.send(
             user_id=user_id,
             random_id=get_random_id(),
             keyboard=keyboard.get_keyboard(),
+            message=message)
+
+    def send_image(self, user_id, message, image):
+        server = self.__vk.method("photos.getMessagesUploadServer")
+        post_req = requests.post(server["upload_url"], files={"photo": open(image, "rb")}).json()
+
+        save = self.__vk.method("photos.saveMessagesPhoto", {"photo": post_req["photo"],
+                                                             "server": post_req["server"],
+                                                             "hash": post_req["hash"]})[0]
+        attachments = ["photo{}_{}".format(save["owner_id"], save["id"])]
+
+        self.__vk_api.messages.send(
+            user_id=user_id,
+            random_id=get_random_id(),
+            attachment=','.join(attachments),
             message=message)
