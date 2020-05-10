@@ -11,7 +11,7 @@ from config import log, vk_api_token as token
 class Bot:
 
     def __init__(self):
-        self.__schedule = Schedule().get()
+        self.__schedule = Schedule()
 
         self.__vk_session = vk_api.VkApi(token=token)
         self.__vk = self.__vk_session.get_api()

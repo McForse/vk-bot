@@ -34,5 +34,5 @@ class Database:
             else:
                 return self.__users.get(uid).get_group()
 
-    def exist_user(self, uid):
+    def user_exist(self, uid):
         return uid in self.__users

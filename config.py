@@ -14,6 +14,11 @@ excel_tables_path = 'schedule/tables/'
 
 json_data_path = 'schedule/data.json'
 
+week_days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+
+week_days_interpreter = {'понедельник': 'MON', 'вторник': 'TUE', 'среда': 'WED', 'четверг': 'THU', 'пятница': 'FRI',
+                         'суббота': 'SAT', 'воскресенье': 'SUN'}
+
 # Регулярные выражения
 
 REGEX_FILE = r'((^http)|(^https))://(.*?)(ИИТ_)(.*?)(.xlsx$)'

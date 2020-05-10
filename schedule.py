@@ -2,8 +2,10 @@ import os
 import re
 import xlrd
 import json
+import locale
 import requests
 from bs4 import BeautifulSoup
+from datetime import datetime, timedelta
 
 import config
 
@@ -12,8 +14,12 @@ class Schedule:
 
     def __init__(self):
         self.__courses_count = 0
+        self.update()
+
+    def update(self):
         self.get_files()
         self.get_data()
+        self.__schedule = self.get()
 
     def get_files(self):
         if not os.path.exists(config.excel_tables_path):
@@ -46,7 +52,6 @@ class Schedule:
     def get_data(self):
         groups_list = []
         groups = {}
-        week_days = ["MON", "TUE", "WED", "THU", "FRI", "SAT"]
 
         for course in range(self.__courses_count):
             book = xlrd.open_workbook(config.excel_tables_path + str(course + 1) + ".xlsx")
@@ -79,7 +84,7 @@ class Schedule:
                                           }
                                 day[i].append(lesson)
 
-                        week[week_days[k]] = day
+                        week[config.week_days[k]] = day
 
                     groups.update({group_cell: week})
 
@@ -96,3 +101,85 @@ class Schedule:
     @staticmethod
     def normalize_string(text):
         return text.replace('\n', ' ')
+
+    def get_day_schedule(self, group, days=0, week_day=''):
+        if week_day == '':
+            locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+            data = datetime.today() + timedelta(days=days)
+            week_day = data.strftime('%a').upper()
+        else:
+            data_offset = config.week_days.index(week_day) - datetime.today().weekday()
+            data = datetime.today() + timedelta(days=data_offset)
+
+        week_number = self.get_study_week_number(days)
+
+        locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
+        message = 'Расписание на {} {} ({}):\n'.format(data.day, data.strftime('%B'), data.strftime('%A'))
+
+        if week_day == 'SUN':
+            message += 'Занятий нет\n\n'
+            return message
+
+        day = self.__schedule[group][week_day]
+
+        for couple in range(6):
+            subject = day[couple][(week_number + 1) % 2]
+            message += str(couple + 1) + ') '
+
+            if subject['subject']:
+                str_except = re.findall(config.REGEX_WEEKS_EXCEPT, subject['subject'])
+                except_weeks = []
+                only_weeks = []
+                subject_name = subject['subject']
+
+                if str_except:
+                    except_weeks = str(str_except[0]).split(',')
+                    subject_name = re.sub(config.REGEX_WEEKS_EXCEPT_DELETE, '', subject_name)
+                else:
+                    str_only = re.findall(config.REGEX_WEEKS_ONLY, subject['subject'])
+                    if str_only:
+                        only_weeks = str(str_only[0]).split(',')
+                        subject_name = re.sub(config.REGEX_WEEKS_ONLY_DELETE, '', subject_name)
+
+                if except_weeks and str(week_number) in except_weeks:
+                    message += '-\n'
+                elif only_weeks and str(week_number) not in only_weeks:
+                    message += '-\n'
+                else:
+                    message += subject_name + ', '
+                    if subject_name:
+                        message += subject['lesson_type'] + ', '
+                    else:
+                        message += '-, '
+                    if subject['lecturer']:
+                        message += subject['lecturer'] + ', '
+                    else:
+                        message += '-, '
+                    if subject['classroom']:
+                        message += subject['classroom'] + '\n'
+                    else:
+                        message += '-\n'
+                    if subject['url']:
+                        message += subject['url'] + '\n'
+
+            else:
+                message += '-\n'
+
+        message += '\n'
+
+        return message
+
+    def group_exist(self, group):
+        return group in self.__schedule
+
+    @staticmethod
+    def get_study_week_number(days=0):
+        month = (datetime.today() + timedelta(days=days)).month
+        week_number = (datetime.today() + timedelta(days=days)).isocalendar()[1]
+
+        if month >= 9:
+            return week_number - 35
+        elif month <= 1:
+            return week_number + 17
+        else:
+            return week_number - 6
