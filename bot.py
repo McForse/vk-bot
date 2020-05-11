@@ -36,7 +36,7 @@ class Bot:
                 res = self.__handler.handle(uid, text.lower())
 
                 # Сообщение
-                if res.get_keyboard() and res.get_image() is None:
+                if res.get_keyboard() is None and res.get_image() is None:
                     self.send_message(uid, res.get_message())
 
                 # Клавиатура

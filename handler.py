@@ -132,9 +132,31 @@ class Handler:
             else:
                 return Response('Я не знаю в какой вы группе')
 
-        # Погода
+        # Меню погоды
         elif text == 'погода':
-            return Response(Weather.get_message('Москва'))
+            keyboard = VkKeyboard(one_time=True)
+            keyboard.add_button('Сейчас', color=VkKeyboardColor.PRIMARY)
+            keyboard.add_button('Сегодня', color=VkKeyboardColor.POSITIVE)
+            keyboard.add_button('Завтра', color=VkKeyboardColor.POSITIVE)
+            keyboard.add_line()
+            keyboard.add_button('На 5 дней', color=VkKeyboardColor.POSITIVE)
+            return Response('Показать погоду в Москве', keyboard=keyboard)
+
+        # Погода сейчас
+        elif text == 'сейчас':
+            return Weather.get_now('Москва')
+
+        # Погода сегодня
+        elif text == 'сегодня':
+            return Weather.get_today('Москва')
+
+        # Погода на завтра
+        elif text == 'завтра':
+            return Response('TODO')
+
+        # Погода на 5 дней
+        elif text == 'на 5 дней':
+            return Response('TODO')
 
         # Коронавирус
         elif text == 'коронавирус' or text == 'ковид':
