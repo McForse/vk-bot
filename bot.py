@@ -43,6 +43,10 @@ class Bot:
                 elif res.get_keyboard() is not None:
                     self.send_keyboard(uid, res.get_message(), res.get_keyboard())
 
+                # Картинка с заголовком
+                elif res.get_image() is not None and res.get_title() is not None:
+                    self.send_title_image(uid, res.get_title(), res.get_message(), res.get_image())
+
                 # Картинка
                 elif res.get_image() is not None:
                     self.send_image(uid, res.get_message(), res.get_image())
@@ -61,6 +65,20 @@ class Bot:
             message=message)
 
     def send_image(self, user_id, message, image):
+        attachments = self.upload_image(image)
+
+        self.__vk_api.messages.send(
+            user_id=user_id,
+            random_id=get_random_id(),
+            attachment=','.join(attachments),
+            message=message)
+
+    def send_title_image(self, user_id, title, message, image):
+        self.send_message(user_id, title)
+        self.send_image(user_id, '', image)
+        self.send_message(user_id, message)
+
+    def upload_image(self, image):
         server = self.__vk.method("photos.getMessagesUploadServer")
         post_req = requests.post(server["upload_url"], files={"photo": open(image, "rb")}).json()
 
@@ -68,9 +86,4 @@ class Bot:
                                                              "server": post_req["server"],
                                                              "hash": post_req["hash"]})[0]
         attachments = ["photo{}_{}".format(save["owner_id"], save["id"])]
-
-        self.__vk_api.messages.send(
-            user_id=user_id,
-            random_id=get_random_id(),
-            attachment=','.join(attachments),
-            message=message)
+        return attachments

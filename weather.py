@@ -36,9 +36,9 @@ class Weather:
         if 'cod' not in data or int(data['cod']) != 200:
             return Response('Произошла ошибка при получении погоды')
 
-        message = 'Погода в {}: {}\n'.format(Utils.prepositional(city), Weather.main[data['weather'][0]['main']])
-        message += Weather.data_message(data)
-        return Response(message=message, image=Weather.icons_path + '{}.png'.format(data['weather'][0]['icon']))
+        title = 'Погода в {}: {}\n'.format(Utils.prepositional(city), Weather.main[data['weather'][0]['main']])
+        message = Weather.data_message(data)
+        return Response(message=message, image=Weather.icons_path + '{}.png'.format(data['weather'][0]['icon']), title=title)
 
     @staticmethod
     def get_today(city):
@@ -79,8 +79,9 @@ class Weather:
             if len(set(fill)) == 1:
                 break
 
-        message = 'Погода в {} сегодня\n{}\n\n{}'.format(Utils.prepositional(city), temp, message)
-        return Weather.save_and_send(message, img)
+        title = 'Погода в {} сегодня'.format(Utils.prepositional(city))
+        message = '{}\n\n{}'.format(temp, message)
+        return Weather.save_and_send(title, message, img)
 
     @staticmethod
     def get_tomorrow(city):
@@ -126,8 +127,9 @@ class Weather:
             if len(set(fill)) == 1:
                 break
 
-        message = 'Погода в {} завтра\n{}\n\n{}'.format(Utils.prepositional(city), temp, message)
-        return Weather.save_and_send(message, img)
+        title = 'Погода в {} завтра'.format(Utils.prepositional(city))
+        message = '{}\n\n{}'.format(temp, message)
+        return Weather.save_and_send(title, message, img)
 
     @staticmethod
     def get_5_days(city):
@@ -139,7 +141,7 @@ class Weather:
         data = data['list']
         current = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
         last = current + timedelta(days=6)
-        message = 'Погода в {} с {} по {}.\n\n'.format(Utils.prepositional(city), current.date(), last.date())
+        title = 'Погода в {} с {} по {}\n\n'.format(Utils.prepositional(city), current.strftime('%d.%m'), last.strftime('%d.%m'))
 
         day = []
         night = []
@@ -174,20 +176,22 @@ class Weather:
                         day_temp = weather['main']['temp_max']
                         icon = Weather.icons_path + '{}.png'.format(weather['weather'][0]['icon'])
 
+        message = ''
+
         for d in day:
             if d is None:
                 message += '/ ---- /'
             else:
-                message += '/ {}°C /'.format(d)
+                message += '/ {}°C /'.format(math.ceil(d))
         message += ' ДЕНЬ\n'
         for n in night:
             if n is None:
                 message += '/ ---- /'
             else:
-                message += '/ {}°C /'.format(n)
+                message += '/ {}°C /'.format(math.trunc(n))
         message += ' НОЧЬ\n'
 
-        return Weather.save_and_send(message, img)
+        return Weather.save_and_send(title, message, img)
 
     @staticmethod
     def data_message(data):
@@ -199,8 +203,7 @@ class Weather:
         return message
 
     @staticmethod
-    def save_and_send(message, img):
-        print(img)
+    def save_and_send(title, message, img):
         new_image = Image.new("RGBA", (200, 50))
         c = 0
         for i in img:
@@ -211,7 +214,7 @@ class Weather:
         import string
         image_name = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
         new_image.save("{}temp/{}.png".format(Weather.path, image_name))
-        return Response(message, image="{}temp/{}.png".format(Weather.path, image_name))
+        return Response(message, image="{}temp/{}.png".format(Weather.path, image_name), title=title)
 
     @staticmethod
     def Pa_mmHg(pa):
