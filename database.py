@@ -34,5 +34,13 @@ class Database:
             else:
                 return self.__users.get(uid).get_group()
 
+    def get_weather_city(self, uid):
+        if uid in self.__users:
+            return self.__users.get(uid).get_weather_city()
+
+    def set_weather_city(self, uid, city):
+        if uid in self.__users:
+            return self.__users.get(uid).set_weather_city(city)
+
     def user_exist(self, uid):
         return uid in self.__users

@@ -13,3 +13,6 @@ class Response:
 
     def get_image(self):
         return self.image
+
+    def is_message(self):
+        return self.keyboard is None and self.image is None

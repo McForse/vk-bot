@@ -33,10 +33,10 @@ class Bot:
                     print('New message from {}, text = {}'.format(uid, text))
 
                 # Обработка запроса
-                res = self.__handler.handle(uid, text.lower())
+                res = self.__handler.handle(uid, text)
 
                 # Сообщение
-                if res.get_keyboard() is None and res.get_image() is None:
+                if res.is_message():
                     self.send_message(uid, res.get_message())
 
                 # Клавиатура

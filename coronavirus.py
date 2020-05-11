@@ -105,11 +105,9 @@ class Coronavirus:
     def get_message(self):
         if self.__last_update is not None and self.__message is not None:
             if not self.check_update(self.__last_update):
-                print('Сообщение из переменной')
                 return self.__message
 
         if not os.path.exists(covid_path + 'info.json') or not os.path.exists(covid_path + 'covid.png'):
-            print('Загрузка данных')
             self.get_data()
 
         file = open(covid_path + 'info.json', 'r')
@@ -117,7 +115,6 @@ class Coronavirus:
         file.close()
 
         if self.check_update(str(data['last_update'])):
-            print('Обновление данных')
             self.get_data()
             file = open(covid_path + 'info.json', 'r')
             data = json.load(file)

@@ -3,6 +3,7 @@ from response import Response
 from coronavirus import Coronavirus
 from datetime import datetime
 from weather import Weather
+from utils import Utils
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 
 import config
@@ -18,9 +19,14 @@ class Handler:
         self.__coronavirus = Coronavirus()
 
     def handle(self, user_id, text):
+        text_o = text
+        text = text.lower()
+
+        if text == 'начать' or text == 'привет':
+            return Response('Номер группы - установка ввашей группы\nБот - работа с расписанием\nПогода - информация о погоде\nКовид - статистика заражённых')
 
         # Установка группы
-        if re.search(config.REGEX_GROUP, text.upper()):
+        elif re.search(config.REGEX_GROUP, text.upper()):
             group = text.upper()
 
             if self.__schedule.group_exist(group):
@@ -134,29 +140,29 @@ class Handler:
 
         # Меню погоды
         elif text == 'погода':
-            keyboard = VkKeyboard(one_time=True)
-            keyboard.add_button('Сейчас', color=VkKeyboardColor.PRIMARY)
-            keyboard.add_button('Сегодня', color=VkKeyboardColor.POSITIVE)
-            keyboard.add_button('Завтра', color=VkKeyboardColor.POSITIVE)
-            keyboard.add_line()
-            keyboard.add_button('На 5 дней', color=VkKeyboardColor.POSITIVE)
-            return Response('Показать погоду в Москве', keyboard=keyboard)
+            return self.get_keyboard_weather('Показать погоду в {}'.format(Utils.prepositional(self.__database.get_weather_city(user_id))))
+
+        # Меню погоды для определённого города
+        elif re.search(REGEX_COMMAND.format('погода'), text):
+            city = text_o.split(' ', 1)[1]
+            self.__database.set_weather_city(user_id, city)
+            return self.get_keyboard_weather('Показать погоду в {}'.format(Utils.prepositional(city)))
 
         # Погода сейчас
         elif text == 'сейчас':
-            return Weather.get_now('Москва')
+            return Weather.get_now(self.__database.get_weather_city(user_id))
 
         # Погода сегодня
         elif text == 'сегодня':
-            return Weather.get_today('Москва')
+            return Weather.get_today(self.__database.get_weather_city(user_id))
 
         # Погода на завтра
         elif text == 'завтра':
-            return Response('TODO')
+            return Weather.get_tomorrow(self.__database.get_weather_city(user_id))
 
         # Погода на 5 дней
         elif text == 'на 5 дней':
-            return Response('TODO')
+            return Weather.get_5_days(self.__database.get_weather_city(user_id))
 
         # Коронавирус
         elif text == 'коронавирус' or text == 'ковид':
@@ -176,4 +182,14 @@ class Handler:
         keyboard.add_line()
         keyboard.add_button('Какая неделя?')
         keyboard.add_button('Какая группа?')
+        return Response(message, keyboard)
+
+    @staticmethod
+    def get_keyboard_weather(message):
+        keyboard = VkKeyboard(one_time=True)
+        keyboard.add_button('Сейчас', color=VkKeyboardColor.PRIMARY)
+        keyboard.add_button('Сегодня', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('Завтра', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_line()
+        keyboard.add_button('На 5 дней', color=VkKeyboardColor.POSITIVE)
         return Response(message, keyboard)
