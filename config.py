@@ -14,6 +14,8 @@ excel_tables_path = 'schedule/tables/'
 
 json_schedule_path = 'schedule/data.json'
 
+json_professors_path = 'schedule/professors.json'
+
 covid_path = 'coronavirus/'
 
 week_days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
@@ -25,6 +27,7 @@ week_days_interpreter = {'понедельник': 'MON', 'вторник': 'TUE
 
 REGEX_FILE = r'((^http)|(^https))://(.*?)(ИИТ_)(.*?)(.xlsx$)'
 REGEX_GROUP = r'^[А-Я]{4}-[0-9]{2}-[0-9]{2}'
+REGEX_PROFESSOR = r'^([А-Яа-я]+) ([А-Яа-я]{1}).([А-Яа-я]{1}).$'
 REGEX_WEEKS_EXCEPT = r'(?:(?<=кр. )|(?<=кр ))(.*?)(?= н.)'
 REGEX_WEEKS_EXCEPT_DELETE = r'((кр. )|(кр )).*?(н. )'
 REGEX_WEEKS_ONLY = r'^(?!кр.*$).*?[0-9,]+(?= н.)'

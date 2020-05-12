@@ -16,12 +16,12 @@ class Database:
         else:
             self.__users[uid] = User(group)
 
-    def get_user_temp_group(self, uid):
+    def get_user_temp(self, uid):
         return self.__users.get(uid)
 
-    def set_user_temp_group(self, uid, temp_group):
+    def set_user_temp(self, uid, temp_group):
         if uid in self.__users:
-            self.__users.get(uid).set_temp_group(temp_group)
+            self.__users.get(uid).set_temp(temp_group)
 
     def remove_user_temp(self, uid):
         if uid in self.__users:
@@ -29,8 +29,8 @@ class Database:
 
     def get_user_last_group(self, uid):
         if uid in self.__users:
-            if self.__users.get(uid).get_temp_group():
-                return self.__users.get(uid).get_temp_group()
+            if self.__users.get(uid).get_temp():
+                return self.__users.get(uid).get_temp()
             else:
                 return self.__users.get(uid).get_group()
 

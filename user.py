@@ -11,10 +11,10 @@ class User:
     def set_group(self, group):
         self.__group = group
 
-    def get_temp_group(self):
+    def get_temp(self):
         return self.__temp_group
 
-    def set_temp_group(self, temp_group):
+    def set_temp(self, temp_group):
         self.__temp_group = temp_group
 
     def remove_temp(self):

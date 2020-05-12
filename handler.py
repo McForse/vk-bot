@@ -23,7 +23,8 @@ class Handler:
         text = text.lower()
 
         if text == 'начать' or text == 'привет':
-            return Response('Номер группы - установка ввашей группы\nБот - работа с расписанием\nПогода - информация о погоде\nКовид - статистика заражённых')
+            return Response(
+                '[Номер группы] - установка ввашей группы\nБот - работа с расписанием\nПогода - информация о погоде\nНайти [фамилия преподователя] - расписание преподователя\nКовид - статистика заражённых')
 
         # Установка группы
         elif re.search(config.REGEX_GROUP, text.upper()):
@@ -84,7 +85,7 @@ class Handler:
                 group = commands[1].upper()
 
                 if self.__schedule.group_exist(group):
-                    self.__database.set_user_temp_group(user_id, group)
+                    self.__database.set_user_temp(user_id, group)
                     return self.get_keyboard_schedule('Показать расписание группы {} ...'.format(group))
                 else:
                     return Response('Такой группы нет')
@@ -98,49 +99,76 @@ class Handler:
 
         # Расписание на сегодня
         elif text == 'на сегодня':
-            if self.__database.user_exist(user_id):
-                message = self.__schedule.get_day_schedule(self.__database.get_user_last_group(user_id))
+            if re.search(config.REGEX_PROFESSOR, self.__database.get_user_last_group(user_id)):
+                message = self.__schedule.get_professor_schedule(self.__database.get_user_last_group(user_id))
                 self.__database.remove_user_temp(user_id)
                 return Response(message)
             else:
-                return Response('Я не знаю в какой вы группе')
+                if self.__database.user_exist(user_id):
+                    message = self.__schedule.get_day_schedule(self.__database.get_user_last_group(user_id))
+                    self.__database.remove_user_temp(user_id)
+                    return Response(message)
+                else:
+                    return Response('Я не знаю в какой вы группе')
 
         # Расписание на завтра
         elif text == 'на завтра':
-            if self.__database.user_exist(user_id):
-                message = self.__schedule.get_day_schedule(self.__database.get_user_last_group(user_id), 1)
+            if re.search(config.REGEX_PROFESSOR, self.__database.get_user_last_group(user_id)):
+                message = self.__schedule.get_professor_schedule(self.__database.get_user_last_group(user_id), 1)
                 self.__database.remove_user_temp(user_id)
                 return Response(message)
             else:
-                return Response('Я не знаю в какой вы группе')
+                if self.__database.user_exist(user_id):
+                    message = self.__schedule.get_day_schedule(self.__database.get_user_last_group(user_id), 1)
+                    self.__database.remove_user_temp(user_id)
+                    return Response(message)
+                else:
+                    return Response('Я не знаю в какой вы группе')
 
         # Расписание на эту неделю
         elif text == 'на неделю' or text == 'на эту неделю':
-            if self.__database.user_exist(user_id):
+            if re.search(config.REGEX_PROFESSOR, self.__database.get_user_last_group(user_id)):
                 message = ''
                 for i in range(6):
-                    message += self.__schedule.get_day_schedule(self.__database.get_user_last_group(user_id),
-                                                                - datetime.today().weekday() + i)
+                    message += self.__schedule.get_professor_schedule(self.__database.get_user_last_group(user_id),
+                                                                      - datetime.today().weekday() + i)
                 self.__database.remove_user_temp(user_id)
                 return Response(message)
             else:
-                return Response('Я не знаю в какой вы группе')
+                if self.__database.user_exist(user_id):
+                    message = ''
+                    for i in range(6):
+                        message += self.__schedule.get_day_schedule(self.__database.get_user_last_group(user_id),
+                                                                    - datetime.today().weekday() + i)
+                    self.__database.remove_user_temp(user_id)
+                    return Response(message)
+                else:
+                    return Response('Я не знаю в какой вы группе')
 
         # Расписание на следующую неделю
         elif text == 'на следующую неделю':
-            if self.__database.user_exist(user_id):
+            if re.search(config.REGEX_PROFESSOR, self.__database.get_user_last_group(user_id)):
                 message = ''
                 for i in range(6):
-                    message += self.__schedule.get_day_schedule(self.__database.get_user_last_group(user_id),
-                                                                7 - datetime.today().weekday() + i)
+                    message += self.__schedule.get_professor_schedule(self.__database.get_user_last_group(user_id),
+                                                                      7 - datetime.today().weekday() + i)
                 self.__database.remove_user_temp(user_id)
                 return Response(message)
             else:
-                return Response('Я не знаю в какой вы группе')
+                if self.__database.user_exist(user_id):
+                    message = ''
+                    for i in range(6):
+                        message += self.__schedule.get_day_schedule(self.__database.get_user_last_group(user_id),
+                                                                    7 - datetime.today().weekday() + i)
+                    self.__database.remove_user_temp(user_id)
+                    return Response(message)
+                else:
+                    return Response('Я не знаю в какой вы группе')
 
         # Меню погоды
         elif text == 'погода':
-            return self.get_keyboard_weather('Показать погоду в {}'.format(Utils.prepositional(self.__database.get_weather_city(user_id))))
+            return self.get_keyboard_weather(
+                'Показать погоду в {}'.format(Utils.prepositional(self.__database.get_weather_city(user_id))))
 
         # Меню погоды для определённого города
         elif re.search(REGEX_COMMAND.format('погода'), text):
@@ -164,6 +192,34 @@ class Handler:
         elif text == 'на 5 дней':
             return Weather.get_5_days(self.__database.get_weather_city(user_id))
 
+        # Распиание преподователя
+        elif re.search(REGEX_COMMAND.format('найти'), text):
+            commands = text_o.split()
+            if len(commands) == 2:
+                professor = commands[1]
+                professors_list = self.__schedule.find_professors_by_last_name(professor)
+                count = len(professors_list)
+                if count == 1:
+                    self.__database.set_user_temp(user_id, professors_list[0])
+                    return self.get_keyboard_professor('Показать расписание преподавателя {}...'.format(professors_list[0]))
+                elif count > 1:
+                    keyboard = VkKeyboard(one_time=True)
+                    for p in professors_list:
+                        keyboard.add_button(p, color=VkKeyboardColor.PRIMARY)
+                    return Response('Выберите преподавателя', keyboard)
+                else:
+                    return Response('Преподователь не найден')
+            else:
+                return Response('Неизвестная команда')
+
+        # Распиание заданного преподователя
+        elif re.search(config.REGEX_PROFESSOR, text_o):
+            if self.__schedule.professor_exist(text_o):
+                self.__database.set_user_temp(user_id, text_o)
+                return self.get_keyboard_professor('Показать расписание преподавателя {}...'.format(text_o))
+            else:
+                return Response('Преподователь не найден')
+
         # Коронавирус
         elif text == 'коронавирус' or text == 'ковид':
             return Response(message=self.__coronavirus.get_message(), image=self.__coronavirus.get_image())
@@ -182,6 +238,16 @@ class Handler:
         keyboard.add_line()
         keyboard.add_button('Какая неделя?')
         keyboard.add_button('Какая группа?')
+        return Response(message, keyboard)
+
+    @staticmethod
+    def get_keyboard_professor(message):
+        keyboard = VkKeyboard(one_time=True)
+        keyboard.add_button('На сегодня', color=VkKeyboardColor.POSITIVE)
+        keyboard.add_button('На завтра', color=VkKeyboardColor.NEGATIVE)
+        keyboard.add_line()
+        keyboard.add_button('На эту неделю', color=VkKeyboardColor.PRIMARY)
+        keyboard.add_button('На следующую неделю', color=VkKeyboardColor.PRIMARY)
         return Response(message, keyboard)
 
     @staticmethod

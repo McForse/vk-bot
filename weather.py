@@ -48,7 +48,7 @@ class Weather:
             return Response('Произошла ошибка при получении погоды')
 
         time = ['НОЧЬ', 'УТРО', 'ДЕНЬ', 'ВЕЧЕР']
-        fill = [False, False, False, False]
+        fill = [False] * 4
         img = []
         temp = ''
 
@@ -91,7 +91,7 @@ class Weather:
             return Response('Произошла ошибка при получении погоды')
 
         time = ['НОЧЬ', 'УТРО', 'ДЕНЬ', 'ВЕЧЕР']
-        fill = [False, False, False, False]
+        fill = [False] * 4
         img = []
         temp = ''
 
