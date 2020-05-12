@@ -5,7 +5,7 @@ class Database:
 
     def __init__(self):
         self.__users = {}
-        self.set_user_group(105205179, 'ИКБО-08-19')
+        #self.set_user_group(105205179, 'ИКБО-08-19')
 
     def get_user_group(self, uid):
         return self.__users.get(uid).get_group()
@@ -33,6 +33,8 @@ class Database:
                 return self.__users.get(uid).get_temp()
             else:
                 return self.__users.get(uid).get_group()
+        else:
+            return ''
 
     def get_weather_city(self, uid):
         if uid in self.__users:
