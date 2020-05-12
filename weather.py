@@ -182,16 +182,16 @@ class Weather:
             if d is None:
                 message += '/ ---- /'
             else:
-                message += '/ {}°C /'.format(math.ceil(d))
+                message += '/ {:>2}°C /'.format(math.ceil(d))
         message += ' ДЕНЬ\n'
         for n in night:
             if n is None:
                 message += '/ ---- /'
             else:
-                message += '/ {}°C /'.format(math.trunc(n))
+                message += '/ {:>2}°C /'.format(math.trunc(n))
         message += ' НОЧЬ\n'
 
-        return Weather.save_and_send(title, message, img)
+        return Weather.save_and_send(title, message, img, 250)
 
     @staticmethod
     def data_message(data):
@@ -203,8 +203,8 @@ class Weather:
         return message
 
     @staticmethod
-    def save_and_send(title, message, img):
-        new_image = Image.new("RGBA", (200, 50))
+    def save_and_send(title, message, img, width=200):
+        new_image = Image.new("RGBA", (width, 50))
         c = 0
         for i in img:
             img2 = Image.open(i)
