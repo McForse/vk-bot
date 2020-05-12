@@ -26,8 +26,8 @@ class Schedule:
         self.save_professors()
 
     def get_files(self):
-        if not os.path.exists(config.excel_tables_path):
-            os.makedirs(config.excel_tables_path)
+        if not os.path.exists(config.schedule_tables_path):
+            os.makedirs(config.schedule_tables_path)
 
         page = requests.get(config.web_schedule_link)
         soup = BeautifulSoup(page.text, 'html.parser')
@@ -46,7 +46,7 @@ class Schedule:
         self.__courses_count = len(links)
 
         for i in range(self.__courses_count):
-            f = open(config.excel_tables_path + str(i + 1) + '.xlsx', 'wb')
+            f = open(config.schedule_tables_path + str(i + 1) + '.xlsx', 'wb')
             resp = requests.get(links[i])
             f.write(resp.content)
 
@@ -58,7 +58,7 @@ class Schedule:
         groups = {}
 
         for course in range(self.__courses_count):
-            book = xlrd.open_workbook(config.excel_tables_path + str(course + 1) + '.xlsx')
+            book = xlrd.open_workbook(config.schedule_tables_path + str(course + 1) + '.xlsx')
             sheet = book.sheet_by_index(0)
 
             num_cols = sheet.ncols

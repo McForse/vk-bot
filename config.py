@@ -10,11 +10,13 @@ web_schedule_link = 'https://www.mirea.ru/schedule/'
 
 institute = 'Институт информационных технологий'
 
-excel_tables_path = 'schedule/tables/'
+schedule_tables_path = 'schedule/tables/'
 
 json_schedule_path = 'schedule/data.json'
 
 json_professors_path = 'schedule/professors.json'
+
+weather_path = 'weather/'
 
 covid_path = 'coronavirus/'
 

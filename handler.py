@@ -41,7 +41,7 @@ class Handler:
             if self.__database.user_exist(user_id):
                 return Response('Показываю расписание группы {}'.format(self.__database.get_user_group(user_id)))
             else:
-                return Response('Я не знаю в какой вы группе')
+                return Response('Я не знаю, в какой вы группе')
 
         # Номер недели
         elif text == 'какая неделя?':
@@ -76,7 +76,7 @@ class Handler:
                                                                    week_day=config.week_days_interpreter[commands[1]])
                         return Response(message)
                     else:
-                        return Response('Я не знаю в какой вы группе')
+                        return Response('Я не знаю, в какой вы группе')
                 else:
                     return Response('Неизвестная команда')
 
@@ -109,7 +109,7 @@ class Handler:
                     self.__database.remove_user_temp(user_id)
                     return Response(message)
                 else:
-                    return Response('Я не знаю в какой вы группе')
+                    return Response('Я не знаю, в какой вы группе')
 
         # Расписание на завтра
         elif text == 'на завтра':
@@ -123,7 +123,7 @@ class Handler:
                     self.__database.remove_user_temp(user_id)
                     return Response(message)
                 else:
-                    return Response('Я не знаю в какой вы группе')
+                    return Response('Я не знаю, в какой вы группе')
 
         # Расписание на эту неделю
         elif text == 'на неделю' or text == 'на эту неделю':
@@ -143,7 +143,7 @@ class Handler:
                     self.__database.remove_user_temp(user_id)
                     return Response(message)
                 else:
-                    return Response('Я не знаю в какой вы группе')
+                    return Response('Я не знаю, в какой вы группе')
 
         # Расписание на следующую неделю
         elif text == 'на следующую неделю':
@@ -163,7 +163,7 @@ class Handler:
                     self.__database.remove_user_temp(user_id)
                     return Response(message)
                 else:
-                    return Response('Я не знаю в какой вы группе')
+                    return Response('Я не знаю, в какой вы группе')
 
         # Меню погоды
         elif text == 'погода':

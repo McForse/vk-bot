@@ -5,14 +5,13 @@ import PIL.Image as Image
 from datetime import datetime, timedelta
 from response import Response
 
-from config import owm_api_key as key
+from config import weather_path as path, owm_api_key as key
 
 
 class Weather:
     url = 'http://api.openweathermap.org/data/2.5/{}?q={}&appid={}&units=metric&lang=ru'
-    path = 'weather/'
+
     icons_path = path + 'icons/'
-    temp = '{"coord":{"lon":37.62,"lat":55.75},"weather":[{"id":804,"main":"Clouds","description":"пасмурно","icon":"04n"}],"base":"stations","main":{"temp":12.66,"feels_like":10.25,"temp_min":12,"temp_max":13,"pressure":1008,"humidity":62},"visibility":10000,"wind":{"speed":2,"deg":350},"clouds":{"all":100},"dt":1589053952,"sys":{"type":1,"id":9027,"country":"RU","sunrise":1588987736,"sunset":1589044980},"timezone":10800,"id":524901,"name":"Москва","cod":200}'
 
     main = {'Thunderstorm': 'гроза', 'Drizzle': 'изморось', 'Rain': 'дождь', 'Snow': 'снег', 'Mist': 'дымка',
             'Smoke': 'дымка', 'Haze': 'мгла', 'Dust': 'Пыль', 'Fog': 'туман', 'Sand': 'песок', 'Ash': 'пепел',
@@ -213,8 +212,8 @@ class Weather:
         import random
         import string
         image_name = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
-        new_image.save("{}temp/{}.png".format(Weather.path, image_name))
-        return Response(message, image="{}temp/{}.png".format(Weather.path, image_name), title=title)
+        new_image.save("{}temp/{}.png".format(path, image_name))
+        return Response(message, image="{}temp/{}.png".format(path, image_name), title=title)
 
     @staticmethod
     def Pa_mmHg(pa):

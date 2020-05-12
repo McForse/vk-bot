@@ -74,8 +74,7 @@ class Bot:
             message=message)
 
     def send_title_image(self, user_id, title, message, image):
-        self.send_message(user_id, title)
-        self.send_image(user_id, '', image)
+        self.send_image(user_id, title, image)
         self.send_message(user_id, message)
 
     def upload_image(self, image):
