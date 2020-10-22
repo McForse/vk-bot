@@ -75,28 +75,32 @@ class Schedule:
 
                         for i in range(6):
                             for j in range(2):
-                                subject = sheet.cell(3 + j + i * 2 + k * 12, col_index).value
-                                lesson_type = sheet.cell(3 + j + i * 2 + k * 12, col_index + 1).value
-                                lecturer = sheet.cell(3 + j + i * 2 + k * 12, col_index + 2).value
-                                classroom = sheet.cell(3 + j + i * 2 + k * 12, col_index + 3).value
-                                url = sheet.cell(3 + j + i * 2 + k * 12, col_index + 4).value
-                                lesson = {'subject': self.normalize_string(subject),
-                                          'lesson_type': self.normalize_string(lesson_type),
-                                          'lecturer': self.normalize_string(lecturer),
-                                          'classroom': self.normalize_string(classroom),
-                                          'url': self.normalize_string(url)}
-                                day[i].append(lesson)
+                                try:
+                                    subject = sheet.cell(3 + j + i * 2 + k * 12, col_index).value
+                                    lesson_type = sheet.cell(3 + j + i * 2 + k * 12, col_index + 1).value
+                                    lecturer = sheet.cell(3 + j + i * 2 + k * 12, col_index + 2).value
+                                    classroom = sheet.cell(3 + j + i * 2 + k * 12, col_index + 3).value
+                                    url = sheet.cell(3 + j + i * 2 + k * 12, col_index + 4).value
+                                    lesson = {'subject': self.normalize_string(subject),
+                                              'lesson_type': self.normalize_string(lesson_type),
+                                              'lecturer': self.normalize_string(lecturer),
+                                              'classroom': self.normalize_string(classroom),
+                                              'url': self.normalize_string(url)}
+                                    day[i].append(lesson)
 
-                                professors_list = lecturer.split('\n')
-                                subject_list = subject.split('\n')
-                                pr_lesson = copy(lesson)
-                                pr_lesson.pop('lecturer')
-                                pr_lesson['group'] = group_cell
+                                    professors_list = self.split_object(lecturer)
+                                    subject_list = self.split_object(subject)
+                                    pr_lesson = copy(lesson)
+                                    pr_lesson.pop('lecturer')
+                                    pr_lesson['group'] = group_cell
 
-                                for h in range(len(professors_list)):
-                                    if len(subject_list) > h:
-                                        pr_lesson['subject'] = subject_list[h]
-                                    self.set_professor(professors_list[h], pr_lesson, config.week_days[k], i, j)
+                                    for h in range(len(professors_list)):
+                                        if len(subject_list) > h:
+                                            pr_lesson['subject'] = subject_list[h]
+                                        self.set_professor(professors_list[h], pr_lesson, config.week_days[k], i, j)
+
+                                except IndexError:
+                                    print('Index error: {}, {}, {}'.format(group_cell, i, j))
 
                         week[config.week_days[k]] = day
 
@@ -131,7 +135,15 @@ class Schedule:
 
     @staticmethod
     def normalize_string(text):
+        if type(text) is not str:
+            return str(text).replace('\n', ' ')
         return text.replace('\n', ' ')
+
+    @staticmethod
+    def split_object(text):
+        if type(text) is not str:
+            return str(text).split('\n')
+        return text.split('\n')
 
     def get_day_schedule(self, group, days=0, week_day=''):
         if week_day == '':

@@ -168,7 +168,7 @@ class Handler:
         # Меню погоды
         elif text == 'погода':
             return self.get_keyboard_weather(
-                'Показать погоду в {}'.format(Utils.prepositional(self.__database.get_weather_city(user_id))))
+                'Показать погоду в {}'.format(Utils.prepositional(self.__database.get_weather_city(user_id)) if self.__database.user_exist(user_id) else 'Москве'))
 
         # Меню погоды для определённого города
         elif re.search(REGEX_COMMAND.format('погода'), text):
